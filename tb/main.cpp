@@ -35,14 +35,9 @@ int main(int argc, char** argv)
 	vcoeff[2] = 1;
 #else
 	for (unsigned k = 0; k < K; k++)
-	{
 		hcoeff[k] = 1;
-	}
-
 	for (unsigned k = 0; k < K; k++)
-	{
 		vcoeff[k] = 1;
-	}
 #endif
 
 	print_matrix(std::cout, IMG_COLS, IMG_ROWS, "Input matrix", src);
@@ -61,6 +56,12 @@ int main(int argc, char** argv)
 	}
 
 	print_matrix(std::cout, IMG_COLS, IMG_ROWS, "Output matrix", dst);
+
+	delete[] src;
+	delete[] dst;
+	delete[] gold_dst;
+	delete[] hcoeff;
+	delete[] vcoeff;
 
 	return 0;
 }
