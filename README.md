@@ -6,7 +6,7 @@ The source code is from the Vivado HLS User Guide *UG902 (v2017.1)*. It is under
 
 ### C++ simulatiom
 ```
-ERROR: Reference and implementation matrices do no match! (87 errors out of 256 elements)
+ERROR: Reference and implementation matrices do no match! (256 errors out of 256 elements)
 ```
 ### Co-simulation
 ```

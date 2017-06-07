@@ -7,7 +7,7 @@
 #define IMG_ROWS 16
 #define IMG_COLS 16
 
-//#define VERBOSE
+#define VERBOSE
 
 int main(int argc, char** argv)
 {
@@ -27,15 +27,19 @@ int main(int argc, char** argv)
 	{
 		for (unsigned col = 0; col < IMG_ROWS; col++)
 		{
-			unsigned idx = col * IMG_COLS + col;
+			unsigned idx = row * IMG_COLS + col;
 			src[idx] = idx;
 			src_stream << idx;
 		}
 	}
 
 	// Set the coefficients
-#if 0
+#if 1
 	// Impulse
+	for (unsigned k = 0; k < K; k++)
+		hcoeff[k] = 0;
+	for (unsigned k = 0; k < K; k++)
+		vcoeff[k] = 0;
 	hcoeff[2] = 1;
 	vcoeff[2] = 1;
 #else
@@ -73,7 +77,7 @@ int main(int argc, char** argv)
 	print_matrix(std::cout, IMG_COLS, IMG_ROWS, "Reference output matrix", orig_dst);
 #endif
 
-	errors++;
+	errors = 0;
 	for (unsigned row = 0; row < IMG_ROWS; row++) {
 		for (unsigned col = 0; col < IMG_ROWS; col++) {
 			if (dst[row * IMG_COLS + col] != orig_dst[row * IMG_COLS + col])
