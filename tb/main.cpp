@@ -27,8 +27,9 @@ int main(int argc, char** argv)
 	{
 		for (unsigned col = 0; col < IMG_ROWS; col++)
 		{
-			src[row * IMG_COLS + col] = 1;
-			src_stream << src[row * IMG_COLS + col];
+			unsigned idx = col * IMG_COLS + col;
+			src[idx] = idx;
+			src_stream << idx;
 		}
 	}
 
@@ -46,8 +47,8 @@ int main(int argc, char** argv)
 
 #ifdef VERBOSE
 	print_matrix(std::cout, IMG_COLS, IMG_ROWS, "Input matrix", src);
-	print_matrix(std::cout, K, 1, "Horizontal coefficients", src);
-	print_matrix(std::cout, 1, K, "Vertical coefficients", src);
+	print_matrix(std::cout, K, 1, "Horizontal coefficients", hcoeff);
+	print_matrix(std::cout, 1, K, "Vertical coefficients", vcoeff);
 #endif
 
 	convolution_strm(IMG_COLS, IMG_ROWS, src_stream, dst_stream, hcoeff, vcoeff);
