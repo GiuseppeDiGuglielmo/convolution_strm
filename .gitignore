@@ -1,0 +1,10 @@
+*log
+.apc
+.cproject
+.project
+.settings
+.vivado_hls_log_all.xml
+.autopilot
+csim
+sim
+syn
