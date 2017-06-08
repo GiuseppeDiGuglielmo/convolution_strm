@@ -11,8 +11,7 @@
 #define MAX_IMG_COLS 1080
 
 #define data_t unsigned
-#define K 5
 
-void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[K], const data_t vcoeff[K]);
+void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[5], const data_t vcoeff[5]);
 
 #endif

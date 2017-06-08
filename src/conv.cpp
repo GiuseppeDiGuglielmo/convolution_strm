@@ -3,6 +3,7 @@
 //#include <hls_video.h>
 #include <cassert>
 
+#if 0
 void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[K], const data_t vcoeff[K])
 {
 #pragma HLS INTERFACE s_axilite depth=5 port=vcoeff bundle=CTRLS
@@ -108,3 +109,4 @@ void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src,
 		}
 	}
 }
+#endif

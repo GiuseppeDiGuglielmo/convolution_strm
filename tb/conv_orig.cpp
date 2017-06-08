@@ -1,6 +1,6 @@
 #include "conv_orig.h"
 
-void convolution_orig(unsigned width, unsigned height, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff)
+void convolution_orig(unsigned height, unsigned width, unsigned K, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff)
 {
 	const int conv_size = K;
 	const int border_width = int(conv_size / 2);
@@ -13,10 +13,10 @@ void convolution_orig(unsigned width, unsigned height, const data_t *src, data_t
 	}
 
 	// Horizontal convolution
-	HconvH: for (int col = 0; col < height; col++)
+	HconvH: for (int row = 0; row < height; row++)
 	{
-		HconvW: for (int row = border_width; row < width - border_width; row++) {
-			int pixel = col * width + row;
+		HconvW: for (int col = border_width; col < width - border_width; col++) {
+			int pixel = row * width + col;
 			Hconv: for (int i = -border_width; i <= border_width; i++)
 			{
 				local[pixel] += src[pixel + i] * hcoeff[i + border_width];
@@ -30,11 +30,11 @@ void convolution_orig(unsigned width, unsigned height, const data_t *src, data_t
 	}
 
 	// Vertical convolution
-	VconvH: for(int col = border_width; col < height - border_width; col++)
+	VconvH: for(int row = border_width; row < height - border_width; row++)
 	{
-		VconvW: for(int row = 0; row < width; row++)
+		VconvW: for(int col = 0; col < width; col++)
 		{
-			int pixel = col * width + row;
+			int pixel = row * width + col;
 			Vconv: for(int i = - border_width; i <= border_width; i++)
 			{
 				int offset = i * width;
@@ -47,58 +47,58 @@ void convolution_orig(unsigned width, unsigned height, const data_t *src, data_t
 	int border_height_offset = (height - border_width - 1) * width;
 
 	// Border pixels
-	Top_Border: for(int col = 0; col < border_width; col++)
+
+	TopBorder: for(int row = 0; row < border_width; row++)
 	{
-		int offset = col * width;
-		Top_Left_Border: for(int row = 0; row < border_width; row++)
+		int offset = row * width;
+		TopLeftBorder: for(int col = 0; col < border_width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[border_width_offset + border_width];
 		}
-		Top_Center_Border: for(int row = border_width; row < width - border_width; row++)
+		TopCenterBorder: for(int col = border_width; col < width - border_width; col++)
 		{
-			int pixel = offset + row;
-			dst[pixel] = dst[border_width_offset + row];
+			int pixel = offset + col;
+			dst[pixel] = dst[border_width_offset + col];
 		}
-		Top_Right_Border: for(int row = width - border_width; row < width; row++)
+		TopRightBorder: for(int col = width - border_width; col < width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[border_width_offset + width - border_width - 1];
 		}
 	}
-
-	Side_Border: for(int col = border_width; col < height - border_width; col++)
+	Side_Border: for(int row = border_width; row < height - border_width; row++)
 	{
-		int offset = col * width;
-		Side_Left_Border: for(int row = 0; row < border_width; row++)
+		int offset = row * width;
+		Side_Left_Border: for(int col = 0; col < border_width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[offset + border_width];
 		}
-		Side_Right_Border: for(int row = width - border_width; row < width; row++)
+		Side_Right_Border: for(int col = width - border_width; col < width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[offset + width - border_width - 1];
 		}
 	}
-
-	Bottom_Border: for(int col = height - border_width; col < height; col++)
+	BottomBorder: for(int row = height - border_width; row < height; row++)
 	{
-		int offset = col * width;
-		Bottom_Left_Border: for(int row = 0; row < border_width; row++)
+		int offset = row * width;
+		BottomLeftBorder: for(int col = 0; col < border_width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[border_height_offset + border_width];
 		}
-		Bottom_Center_Border: for(int row = border_width; row < width - border_width; row++)
+		BottomCenterBorder: for(int col = border_width; col < width - border_width; col++)
 		{
-			int pixel = offset + row;
-			dst[pixel] = dst[border_height_offset + row];
+			int pixel = offset + col;
+			dst[pixel] = dst[border_height_offset + col];
 		}
-		Bottom_Right_Border: for(int row = width - border_width; row < width; row++)
+		BottomRightBorder: for(int col = width - border_width; col < width; col++)
 		{
-			int pixel = offset + row;
+			int pixel = offset + col;
 			dst[pixel] = dst[border_height_offset + width - border_width - 1];
 		}
 	}
 }
+
