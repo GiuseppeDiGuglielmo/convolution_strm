@@ -1,13 +1,11 @@
 #include "conv.h"
 
-//#include <hls_video.h>
 #include <cassert>
 
-#if 0
-void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[K], const data_t vcoeff[K])
+void convolution_strm(unsigned height, unsigned width, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[K], const data_t vcoeff[K])
 {
-#pragma HLS INTERFACE s_axilite depth=5 port=vcoeff bundle=CTRLS
-#pragma HLS INTERFACE s_axilite depth=5 port=hcoeff bundle=CTRLS
+#pragma HLS INTERFACE s_axilite depth=K port=vcoeff bundle=CTRLS
+#pragma HLS INTERFACE s_axilite depth=K port=hcoeff bundle=CTRLS
 #pragma HLS INTERFACE s_axilite port=height bundle=CTRLS
 #pragma HLS INTERFACE s_axilite port=width bundle=CTRLS
 #pragma HLS INTERFACE s_axilite port=return bundle=CTRLS
@@ -16,19 +14,17 @@ void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src,
 
 #pragma HLS DATAFLOW
 
+	// Local streams and buffers
 	hls::stream<data_t> hconv("hconv");
 	hls::stream<data_t> vconv("vconv");
 	unsigned hwin[K];
+	unsigned borderbuf[MAX_IMG_COLS];
+	unsigned linebuf[K-1][(MAX_IMG_COLS-(K/2))];
+#pragma HLS ARRAY_PARTITION variable=linebuf dim=1 complete
 
 	const unsigned conv_size = K;
 	const unsigned border_width = int(conv_size / 2);
 	const unsigned vconv_xlim = width - (K - 1);
-
-	//hls::LineBuffer<K-1, (MAX_IMG_COLS-(K/2)), data_t> linebuf;
-	unsigned linebuf[K-1][(MAX_IMG_COLS-(K/2))];
-#pragma HLS ARRAY_PARTITION variable=linebuf dim=1 complete
-
-	unsigned borderbuf[MAX_IMG_COLS];
 
 	// These assertions let HLS know the upper bounds of loops
 	assert(height < MAX_IMG_ROWS);
@@ -36,9 +32,9 @@ void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src,
 	assert(vconv_xlim < MAX_IMG_COLS - (K - 1));
 
 	// Horizontal convolution
-	HConvW: for(unsigned row = 0; row < width; row++)
+	HconvH: for (unsigned row = 0; row < height; row++)
 	{
-		HconvW:for(unsigned row = border_width; row < width - border_width; row++)
+		HconvW: for(unsigned col = 0; col < width; col++)
 		{
 #pragma HLS PIPELINE
 			data_t in_val = src.read();
@@ -48,65 +44,69 @@ void convolution_strm(unsigned width, unsigned height, hls::stream<data_t> &src,
 				hwin[i] = i < K - 1 ? hwin[i + 1] : in_val;
 				out_val += hwin[i] * hcoeff[i];
 			}
-			if (row >= K - 1)
+			if (col >= K - 1)
+			{
 				hconv << out_val;
+			}
 		}
 	}
 
 	// Vertical convolution
-	VConvH: for(int col = 0; col < height; col++)
+	VconvH: for(int row = 0; row < height; row++)
 	{
-		VConvW: for(int row = 0; row < vconv_xlim; row++)
+		VconvW: for(int col = 0; col < vconv_xlim; col++)
 		{
 #pragma HLS PIPELINE
 #pragma HLS DEPENDENCE variable=linebuf inter false
 			data_t in_val = hconv.read();
 			data_t out_val = 0;
-			VConv: for(int i = 0; i < K; i++)
+			Vconv: for(int i = 0; i < K; i++)
 			{
-				data_t vwin_val = i < K - 1 ? linebuf[i][row] : in_val;
+				data_t vwin_val = i < K - 1 ? linebuf[i][col] : in_val;
 				out_val += vwin_val * vcoeff[i];
 				if (i > 0)
-					linebuf[i - 1][row] = vwin_val;
+					linebuf[i - 1][col] = vwin_val;
 			}
-			if (col >= K - 1)
+			if (row >= K - 1)
+			{
 				vconv << out_val;
+			}
 		}
 	}
 
-	Border: for (int i = 0; i < height; i++)
+	BorderRow: for (int row = 0; row < height; row++)
 	{
-		for (int j = 0; j < width; j++)
+		BorderCol: for (int col = 0; col < width; col++)
 		{
 			data_t pix_in, l_edge_pix, r_edge_pix, pix_out;
 #pragma HLS PIPELINE
-			if (i == 0 || (i > border_width && i < height - border_width))
+			if (row == 0 || (row > border_width && row < height - border_width))
 			{
-				if (j < width - (K - 1))
+				if (col < width - (K - 1))
 				{
 					pix_in = vconv.read();
-					borderbuf[j] = pix_in;
+					borderbuf[col] = pix_in;
 				}
-				if (j == 0)
+				if (col == 0)
 				{
 					l_edge_pix = pix_in;
 				}
-				if (j == width - K)
+				if (col == width - K)
 				{
 					r_edge_pix = pix_in;
 				}
 			}
-			if (j <= border_width)
+			if (col <= border_width)
 			{
 				pix_out = l_edge_pix;
-			} else if (j >= width - border_width - 1)
+			} else if (col >= width - border_width - 1)
 			{
 				pix_out = r_edge_pix;
 			} else {
-				pix_out = borderbuf[j - border_width];
+				pix_out = borderbuf[col - border_width];
 			}
 			dst << pix_out;
 		}
 	}
 }
-#endif
+

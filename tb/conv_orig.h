@@ -8,6 +8,6 @@
 
 #define data_t unsigned
 
-void convolution_orig(unsigned width, unsigned height, unsigned K, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff);
+void convolution_orig(unsigned width, unsigned height, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff);
 
 #endif

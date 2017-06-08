@@ -8,7 +8,4 @@ The original source code at page 362 of *UG902 (v2017.1)* is confusing in the us
 - col, width, MAX_IMG_COLS are "horizontal" variable, dimension, constant
 - row, height, MAX_IMG_ROWS are "vertical" variable, dimension, constant
 
-I have to port the synthesizable code to the same code convention. At the moment the synthesizable code is disabled.
-
-
-
+At the moment, the synthesizable code is functionally correct but the co-simulation stucks (there is a deadlock somewhere).

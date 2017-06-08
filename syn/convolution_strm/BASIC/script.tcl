@@ -5,10 +5,10 @@
 ############################################################
 open_project convolution_strm
 set_top convolution_strm
-add_files ../src/conv.cpp -cflags "-I../inc -I../tb"
-add_files -tb ../tb/conv_orig.cpp -cflags "-I../inc -I../tb"
-add_files -tb ../tb/main.cpp -cflags "-DVERBOSE -DINPUT_SIZE_SMALL -I../inc -I../tb"
-add_files -tb ../tb/utils.cpp -cflags "-I../inc -I../tb"
+add_files ../src/conv.cpp -cflags "-I../inc -I../tb  -DK=5"
+add_files -tb ../tb/conv_orig.cpp -cflags "-DK=5 -I../inc -I../tb"
+add_files -tb ../tb/main.cpp -cflags "-DVERBOSE -DINPUT_SIZE_SMALL -DK=5 -I../inc -I../tb"
+add_files -tb ../tb/utils.cpp -cflags "-DK=5 -I../inc -I../tb"
 open_solution "BASIC"
 set_part {xc7z020clg484-1} -tool vivado
 create_clock -period 10 -name default

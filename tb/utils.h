@@ -42,7 +42,7 @@ namespace Color {
 #endif
 
 template<typename T>
-void print_matrix(std::ostream &out, unsigned n_rows, unsigned n_cols, std::string label, const T *matrix, unsigned K = 0, bool highlight = false) {
+void print_matrix(std::ostream &out, unsigned n_rows, unsigned n_cols, std::string label, const T *matrix, bool highlight = false) {
 #ifdef COLORIZED_OUTPUT
 	Color::Modifier green(Color::FG_GREEN);
 	Color::Modifier red(Color::FG_RED);

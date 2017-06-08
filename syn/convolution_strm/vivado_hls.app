@@ -1,9 +1,9 @@
 <project xmlns="com.autoesl.autopilot.project" name="convolution_strm" top="convolution_strm">
     <files>
-        <file name="../src/conv.cpp" sc="0" tb="false" cflags="-I../inc -I../tb"/>
-        <file name="../../../tb/conv_orig.cpp" sc="0" tb="1" cflags="-I../../../inc -I../../../tb"/>
-        <file name="../../../tb/main.cpp" sc="0" tb="1" cflags="-DVERBOSE -DINPUT_SIZE_SMALL -I../../../inc -I../../../tb"/>
-        <file name="../../../tb/utils.cpp" sc="0" tb="1" cflags="-I../../../inc -I../../../tb"/>
+        <file name="../src/conv.cpp" sc="0" tb="false" cflags="-I../inc -I../tb  -DK=5"/>
+        <file name="../../../tb/conv_orig.cpp" sc="0" tb="1" cflags="-DK=5 -I../../../inc -I../../../tb"/>
+        <file name="../../../tb/main.cpp" sc="0" tb="1" cflags="-DVERBOSE -DINPUT_SIZE_SMALL -DK=5 -I../../../inc -I../../../tb"/>
+        <file name="../../../tb/utils.cpp" sc="0" tb="1" cflags="-DK=5 -I../../../inc -I../../../tb"/>
     </files>
     <includePaths/>
     <libraryPaths/>

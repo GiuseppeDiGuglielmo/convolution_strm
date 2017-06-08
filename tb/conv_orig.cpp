@@ -1,6 +1,6 @@
 #include "conv_orig.h"
 
-void convolution_orig(unsigned height, unsigned width, unsigned K, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff)
+void convolution_orig(unsigned height, unsigned width, const data_t *src, data_t *dst, const data_t *hcoeff, const data_t *vcoeff)
 {
 	const int conv_size = K;
 	const int border_width = int(conv_size / 2);
