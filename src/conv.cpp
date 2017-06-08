@@ -4,8 +4,8 @@
 
 void convolution_strm(unsigned height, unsigned width, hls::stream<data_t> &src, hls::stream<data_t> &dst, const data_t hcoeff[K], const data_t vcoeff[K])
 {
-#pragma HLS INTERFACE s_axilite depth=K port=vcoeff bundle=CTRLS
-#pragma HLS INTERFACE s_axilite depth=K port=hcoeff bundle=CTRLS
+#pragma HLS INTERFACE ap_memory depth=K port=hcoeff
+#pragma HLS INTERFACE ap_memory depth=K port=vcoeff
 #pragma HLS INTERFACE s_axilite port=height bundle=CTRLS
 #pragma HLS INTERFACE s_axilite port=width bundle=CTRLS
 #pragma HLS INTERFACE s_axilite port=return bundle=CTRLS
@@ -17,19 +17,30 @@ void convolution_strm(unsigned height, unsigned width, hls::stream<data_t> &src,
 	// Local streams and buffers
 	hls::stream<data_t> hconv("hconv");
 	hls::stream<data_t> vconv("vconv");
-	unsigned hwin[K];
-	unsigned borderbuf[MAX_IMG_COLS];
-	unsigned linebuf[K-1][(MAX_IMG_COLS-(K/2))];
+	data_t hwin[K];
+	data_t borderbuf[MAX_IMG_COLS];
+	data_t linebuf[K-1][(MAX_IMG_COLS-(K/2))];
 #pragma HLS ARRAY_PARTITION variable=linebuf dim=1 complete
+    data_t hcoeffbuf[K];
+#pragma HLS ARRAY_PARTITION variable=hcoeffbuf dim=1 complete
+    data_t vcoeffbuf[K];
+#pragma HLS ARRAY_PARTITION variable=vcoeffbuf dim=1 complete
 
 	const unsigned conv_size = K;
 	const unsigned border_width = int(conv_size / 2);
 	const unsigned vconv_xlim = width - (K - 1);
 
 	// These assertions let HLS know the upper bounds of loops
+	assert(height >= K);
+	assert(width >= K);
 	assert(height < MAX_IMG_ROWS);
 	assert(width < MAX_IMG_COLS);
 	assert(vconv_xlim < MAX_IMG_COLS - (K - 1));
+
+	for (unsigned idx = 0; idx < K; idx++)
+		hcoeffbuf[idx] = hcoeff[idx];
+	for (unsigned idx = 0; idx < K; idx++)
+		vcoeffbuf[idx] = vcoeff[idx];
 
 	// Horizontal convolution
 	HconvH: for (unsigned row = 0; row < height; row++)
@@ -42,7 +53,7 @@ void convolution_strm(unsigned height, unsigned width, hls::stream<data_t> &src,
 			HConv: for(unsigned i = 0; i < K; i++)
 			{
 				hwin[i] = i < K - 1 ? hwin[i + 1] : in_val;
-				out_val += hwin[i] * hcoeff[i];
+				out_val += hwin[i] * hcoeffbuf[i];
 			}
 			if (col >= K - 1)
 			{
@@ -63,7 +74,7 @@ void convolution_strm(unsigned height, unsigned width, hls::stream<data_t> &src,
 			Vconv: for(int i = 0; i < K; i++)
 			{
 				data_t vwin_val = i < K - 1 ? linebuf[i][col] : in_val;
-				out_val += vwin_val * vcoeff[i];
+				out_val += vwin_val * vcoeffbuf[i];
 				if (i > 0)
 					linebuf[i - 1][col] = vwin_val;
 			}

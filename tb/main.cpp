@@ -5,8 +5,8 @@
 #include "utils.h"
 
 #ifdef INPUT_SIZE_SMALL
-#define IMG_ROWS 8
-#define IMG_COLS 12
+#define IMG_ROWS 4
+#define IMG_COLS 6
 #else
 #define IMG_ROWS 1080
 #define IMG_COLS 1920
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 
 	convolution_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream, hcoeff, vcoeff);
 
-	get_output_data(dst, dst_stream, IMG_ROWS * IMG_COLS);
+	get_output_data(dst, dst_stream, (IMG_ROWS * IMG_COLS));
 
 #ifdef VERBOSE
 	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Implementation output matrix", dst, true);
