@@ -63,9 +63,9 @@ int main(int argc, char** argv)
 	set_impulse_coefficient(vcoeff);
 
 #ifdef VERBOSE
-	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Input matrix", src);
-	print_matrix(std::cout, KSIZE, 1, "Horizontal coefficients", hcoeff);
-	print_matrix(std::cout, 1, KSIZE, "Vertical coefficients", vcoeff);
+	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Input matrix", src);
+	print_matrix<unsigned, KSIZE>(std::cout, KSIZE, 1, "Horizontal coefficients", hcoeff);
+	print_matrix<unsigned, KSIZE>(std::cout, 1, KSIZE, "Vertical coefficients", vcoeff);
 #endif
 
 	top_convolution_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream, hcoeff, vcoeff);
@@ -73,14 +73,14 @@ int main(int argc, char** argv)
 	get_output_data(dst, dst_stream, (IMG_ROWS * IMG_COLS));
 
 #ifdef VERBOSE
-	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Implementation output matrix", dst, true);
+	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Implementation output matrix", dst, true);
 #endif
 
     // Validation
     top_convolution_orig(IMG_ROWS, IMG_COLS, src, orig_dst, hcoeff, vcoeff);
 
 #ifdef VERBOSE
-	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Reference output matrix", orig_dst, true);
+	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Reference output matrix", orig_dst, true);
 #endif
 
 	run_validation(orig_dst, dst, IMG_ROWS*IMG_COLS);
