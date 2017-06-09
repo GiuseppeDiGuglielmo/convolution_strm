@@ -1,16 +1,11 @@
 #include <iostream>
 
-#include "conv.h"
 #include "conv_orig.h"
+#include "config.h"
 #include "utils.h"
+#include "conv.h"
 
-#ifdef INPUT_SIZE_SMALL
-#define IMG_ROWS 4
-#define IMG_COLS 6
-#else
-#define IMG_ROWS 1080
-#define IMG_COLS 1920
-#endif
+#define data_t unsigned
 
 void set_input_data(hls::stream<data_t> &stream, data_t *matrix, unsigned n_data)
 {
@@ -29,9 +24,9 @@ void get_output_data(data_t *matrix, hls::stream<data_t> &stream, unsigned n_dat
 
 void set_impulse_coefficient(data_t* coeff)
 {
-	for (unsigned k = 0; k < K; k++)
+	for (unsigned k = 0; k < KSIZE; k++)
 		coeff[k] = 0;
-	coeff[K/2] = 1;
+	coeff[KSIZE/2] = 1;
 }
 
 void run_validation(data_t *ref, data_t *imp, unsigned n_data)
@@ -57,8 +52,8 @@ int main(int argc, char** argv)
 	data_t *src = new data_t[IMG_ROWS * IMG_COLS];
 	data_t *dst = new data_t[IMG_ROWS * IMG_COLS];
 	data_t *orig_dst = new data_t[IMG_ROWS * IMG_COLS];
-	data_t hcoeff[K];
-	data_t vcoeff[K];
+	data_t hcoeff[KSIZE];
+	data_t vcoeff[KSIZE];
 
 	hls::stream<data_t> src_stream("src_stream");
 	hls::stream<data_t> dst_stream("dst_stream");
@@ -69,11 +64,11 @@ int main(int argc, char** argv)
 
 #ifdef VERBOSE
 	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Input matrix", src);
-	print_matrix(std::cout, K, 1, "Horizontal coefficients", hcoeff);
-	print_matrix(std::cout, 1, K, "Vertical coefficients", vcoeff);
+	print_matrix(std::cout, KSIZE, 1, "Horizontal coefficients", hcoeff);
+	print_matrix(std::cout, 1, KSIZE, "Vertical coefficients", vcoeff);
 #endif
 
-	convolution_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream, hcoeff, vcoeff);
+	top_convolution_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream, hcoeff, vcoeff);
 
 	get_output_data(dst, dst_stream, (IMG_ROWS * IMG_COLS));
 
@@ -82,7 +77,7 @@ int main(int argc, char** argv)
 #endif
 
     // Validation
-    convolution_orig(IMG_ROWS, IMG_COLS, src, orig_dst, hcoeff, vcoeff);
+    top_convolution_orig(IMG_ROWS, IMG_COLS, src, orig_dst, hcoeff, vcoeff);
 
 #ifdef VERBOSE
 	print_matrix(std::cout, IMG_ROWS, IMG_COLS, "Reference output matrix", orig_dst, true);
