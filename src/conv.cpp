@@ -28,15 +28,15 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	assert(vconv_xlim <= MAX_IMG_COLS - (K - 1));
 
 	// Horizontal convolution
-	HconvH: for (int row = 0; row < height; row++)
+	HconvH: for (unsigned row = 0; row < height; row++)
 	{
-		HconvW: for (int col = 0; col < width; col++)
+		HconvW: for (unsigned col = 0; col < width; col++)
 		{
 #pragma HLS PIPELINE
 			T in_val = src.read();
 
 			T out_val = 0;
-			HConv: for (int i = 0; i < K; i++)
+			HConv: for (unsigned short i = 0; i < K; i++)
 			{
 				hwin[i] = i < K - 1 ? hwin[i + 1] : in_val;
 				out_val += hwin[i] * hcoeff[i];
@@ -49,16 +49,16 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	}
 
 	// Vertical convolution
-	VconvH: for (int row = 0; row < height; row++)
+	VconvH: for (unsigned row = 0; row < height; row++)
 	{
-		VconvW: for (int col = 0; col < vconv_xlim; col++)
+		VconvW: for (unsigned col = 0; col < vconv_xlim; col++)
 		{
 #pragma HLS DEPENDENCE variable=linebuf inter true
 #pragma HLS PIPELINE
 			T in_val = hconv.read();
 
 			T out_val = 0;
-			Vconv: for (int i = 0; i < K; i++)
+			Vconv: for (short i = 0; i < K; i++) // ATTENTION: it has to be a signed short
 			{
 				T vwin_val = i < K - 1 ? linebuf[i][col] : in_val;
 				out_val += vwin_val * vcoeff[i];
@@ -73,9 +73,9 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	}
 
 	// Handle the borders
-	BorderRow: for (int row = 0; row < height; row++)
+	BorderRow: for (unsigned row = 0; row < height; row++)
 	{
-		BorderCol: for (int col = 0; col < width; col++)
+		BorderCol: for (int col = 0; col < width; col++)  // ATTENTION: it has to be a signed integer
 		{
 			T pix_in, l_edge_pix, r_edge_pix, pix_out;
 #pragma HLS PIPELINE
