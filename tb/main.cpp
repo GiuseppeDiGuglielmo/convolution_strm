@@ -52,32 +52,28 @@ int main(int argc, char** argv)
 	data_t *src = new data_t[IMG_ROWS * IMG_COLS];
 	data_t *dst = new data_t[IMG_ROWS * IMG_COLS];
 	data_t *orig_dst = new data_t[IMG_ROWS * IMG_COLS];
-	data_t hcoeff[KSIZE];
-	data_t vcoeff[KSIZE];
 
 	hls::stream<data_t> src_stream("src_stream");
 	hls::stream<data_t> dst_stream("dst_stream");
 
 	set_input_data(src_stream, src, IMG_ROWS * IMG_COLS);
-	set_impulse_coefficient(hcoeff);
-	set_impulse_coefficient(vcoeff);
 
 #ifdef VERBOSE
 	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Input matrix", src);
-	print_matrix<unsigned, KSIZE>(std::cout, KSIZE, 1, "Horizontal coefficients", hcoeff);
-	print_matrix<unsigned, KSIZE>(std::cout, 1, KSIZE, "Vertical coefficients", vcoeff);
 #endif
 
-	top_convolution_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream, hcoeff, vcoeff);
+	filter_3x3_impulse_strm(IMG_ROWS, IMG_COLS, src_stream, dst_stream);
 
 	get_output_data(dst, dst_stream, (IMG_ROWS * IMG_COLS));
+	//get_output_data(dst, dst_stream, (IMG_ROWS * IMG_COLS) - (IMG_ROWS*(2*(KSIZE/2))) );
+	//get_output_data(dst, dst_stream, ((IMG_ROWS - 2*(KSIZE/2)) * (IMG_COLS - 2*(KSIZE/2))) );
 
 #ifdef VERBOSE
 	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Implementation output matrix", dst, true);
 #endif
 
     // Validation
-    top_convolution_orig(IMG_ROWS, IMG_COLS, src, orig_dst, hcoeff, vcoeff);
+	filter_3x3_impulse_orig(IMG_ROWS, IMG_COLS, src, orig_dst);
 
 #ifdef VERBOSE
 	print_matrix<unsigned, KSIZE>(std::cout, IMG_ROWS, IMG_COLS, "Reference output matrix", orig_dst, true);
@@ -89,5 +85,5 @@ int main(int argc, char** argv)
 	delete[] dst;
 	delete[] orig_dst;
 
-	return 0;
+	return(0);
 }

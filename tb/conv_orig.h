@@ -52,7 +52,6 @@ void convolution_orig(unsigned height, unsigned width, const T *src, T *dst, con
 	int border_height_offset = (height - border_width - 1) * width;
 
 	// Border pixels
-
 	TopBorder: for(int row = 0; row < border_width; row++)
 	{
 		int offset = row * width;
@@ -107,7 +106,6 @@ void convolution_orig(unsigned height, unsigned width, const T *src, T *dst, con
 	}
 }
 
-
-void top_convolution_orig(unsigned height, unsigned width, unsigned *src, unsigned *dst, const unsigned hcoeff[KSIZE], const unsigned vcoeff[KSIZE]);
+void filter_3x3_impulse_orig(unsigned height, unsigned width, unsigned *src, unsigned *dst);
 
 #endif
