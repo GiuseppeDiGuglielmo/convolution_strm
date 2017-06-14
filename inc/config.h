@@ -1,11 +1,17 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include <stdint.h>
+#include <ap_int.h>
 
 #define INPUT_SIZE_4KUHD
 
-typedef uint32_t data_t;
+typedef unsigned data_t;
+typedef ap_uint<16> index_u16_t;
+typedef ap_int<16> index_d16_t;
+typedef ap_uint<8> index_u8_t;
+typedef ap_int<8> index_d8_t;
+
+
 
 // Max 8K Ultra-HD
 #define MAX_IMG_COLS 7680

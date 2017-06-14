@@ -1,11 +1,11 @@
 #include "conv.h"
 
 template<typename T, int K>
-static void convolution_strm(int height, int width, hls::stream<T> &src, hls::stream<T> &dst, const T *hcoeff, const T *vcoeff)
+static void convolution_strm(index_d16_t height, index_d16_t width, hls::stream<T> &src, hls::stream<T> &dst, const T *hcoeff, const T *vcoeff)
 {
 	// The border width is half the convolution window - rounded down
 	const int border_width = int(K / 2);
-	const int vconv_xlim = width - (K - 1);
+	const index_d16_t vconv_xlim = width - (K - 1);
 
 	// Local streams
 	hls::stream<T> hconv("hconv");
@@ -28,15 +28,15 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	assert(vconv_xlim <= MAX_IMG_COLS - (K - 1));
 
 	// Horizontal convolution
-	HconvH: for (unsigned row = 0; row < height; row++)
+	HconvH: for (index_d16_t row = 0; row < height; row++)
 	{
-		HconvW: for (unsigned col = 0; col < width; col++)
+		HconvW: for (index_d16_t col = 0; col < width; col++)
 		{
 #pragma HLS PIPELINE
 			T in_val = src.read();
 
 			T out_val = 0;
-			HConv: for (unsigned short i = 0; i < K; i++)
+			HConv: for (index_d8_t i = 0; i < K; i++)
 			{
 				hwin[i] = i < K - 1 ? hwin[i + 1] : in_val;
 				out_val += hwin[i] * hcoeff[i];
@@ -49,16 +49,16 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	}
 
 	// Vertical convolution
-	VconvH: for (unsigned row = 0; row < height; row++)
+	VconvH: for (index_d16_t row = 0; row < height; row++)
 	{
-		VconvW: for (unsigned col = 0; col < vconv_xlim; col++)
+		VconvW: for (index_d16_t col = 0; col < vconv_xlim; col++)
 		{
 #pragma HLS DEPENDENCE variable=linebuf inter true
 #pragma HLS PIPELINE
 			T in_val = hconv.read();
 
 			T out_val = 0;
-			Vconv: for (short i = 0; i < K; i++) // ATTENTION: it has to be a signed short
+			Vconv: for (index_d8_t i = 0; i < K; i++) // ATTENTION: it has to be a signed short
 			{
 				T vwin_val = i < K - 1 ? linebuf[i][col] : in_val;
 				out_val += vwin_val * vcoeff[i];
@@ -73,9 +73,9 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	}
 
 	// Handle the borders
-	BorderRow: for (unsigned row = 0; row < height; row++)
+	BorderRow: for (index_d16_t row = 0; row < height; row++)
 	{
-		BorderCol: for (int col = 0; col < width; col++)  // ATTENTION: it has to be a signed integer
+		BorderCol: for (index_d16_t col = 0; col < width; col++)  // ATTENTION: it has to be a signed integer
 		{
 			T pix_in, l_edge_pix, r_edge_pix, pix_out;
 #pragma HLS PIPELINE
@@ -108,7 +108,7 @@ static void convolution_strm(int height, int width, hls::stream<T> &src, hls::st
 	}
 }
 
-void filter_3x3_impulse_strm(int height, int width, hls::stream<data_t> &src, hls::stream<data_t> &dst)
+void filter_3x3_impulse_strm(index_d16_t height, index_d16_t width, hls::stream<data_t> &src, hls::stream<data_t> &dst)
 {
 #pragma HLS INTERFACE axis port=&src
 #pragma HLS INTERFACE axis port=&dst

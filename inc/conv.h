@@ -6,6 +6,6 @@
 
 #include "config.h"
 
-void filter_3x3_impulse_strm(int height, int width, hls::stream<data_t> &src, hls::stream<data_t> &dst);
+void filter_3x3_impulse_strm(index_d16_t height, index_d16_t width, hls::stream<data_t> &src, hls::stream<data_t> &dst);
 
 #endif
