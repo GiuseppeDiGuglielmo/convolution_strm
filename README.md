@@ -1,11 +1,9 @@
-# Algorithm With Optimal Data Access Patterns
+# A convolution algorithm with optimal data access patterns
 
-The source code is from the Vivado HLS User Guide *UG902 (v2017.1)*. It is under development, if you are willing to contribute I will be glad. For a complete description see UG902 pages 361-380.
+The convolution algorithm is described in the Vivado HLS User Guide *UG902 (v2017.1)* at the pages 361-380. Xilinx provides an implementation of it with the examples of Vivado HLS. I am trying to improving as much as possible. If you are willing to contribute, I will be glad.
 
 ## Current situation
     
-The original source code at page 362 of *UG902 (v2017.1)* is confusing in the use of row, col, width, height, MAX_IMG_ROWS, and MAX_IMG_COLS. I normalized the code:
+The original source code is confusing in the use of row, col, width, height, MAX_IMG_ROWS, and MAX_IMG_COLS. I normalized the code:
 - col, width, MAX_IMG_COLS are "horizontal" variable, dimension, constant
 - row, height, MAX_IMG_ROWS are "vertical" variable, dimension, constant
-
-At the moment, the synthesizable code is functionally correct but the co-simulation stucks (there is a deadlock somewhere).
